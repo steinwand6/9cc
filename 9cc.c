@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
   Token *token = tokenize(argv[1]);
 
   // 抽象構文木を作成
-  Node *node = expr(token);
+  Node *node = program(token);
 
   // アセンブリの前半部分を出力
   printf(".intel_syntax noprefix\n");

@@ -29,6 +29,10 @@ void error_at(char *loc, char *fmt, ...) {
   exit(1);
 }
 
+bool at_eof() {
+  return token->kind == TK_EOF;
+}
+
 // 新しいトークンを作成してcurに繋げる
 Token *new_token(TokenKind kind, Token *cur, char *str, int len) {
   Token *tok = calloc(1, sizeof(Token));
@@ -77,7 +81,7 @@ Token *tokenize(char *p) {
       continue;
     }
 
-    if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')' || *p == '<' || *p == '>') {
+    if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == ';') {
       cur = new_token(TK_RESERVED, cur, p++, 1);
       continue;
     }
@@ -142,12 +146,12 @@ Node *new_node_num(int val) {
   return node;
 }
 
-Node *expr(Token*);
+Node *expr();
 
 Node *primary() {
   Node *node = calloc(1, sizeof(Node));
   if(consume("(")) {
-    node = expr(token);
+    node = expr();
     expect(")");
     return node;
   }
@@ -221,7 +225,27 @@ Node *equality() {
 
 }
 
-Node *expr(Token *input_token) {
+Node *assign() {
+  Node *node = equality();
+  for(;;) {
+    if(consume("=")) {
+      node = new_node(ND_ASSIGN, node, assign());
+    }
+    return node;
+  }
+}
+
+Node *expr() {
+  return assign();
+}
+
+Node *stmt() {
+  Node *node = expr();
+  expect(";");
+  return node;
+}
+
+Node *program(Token *input_token) {
   token = input_token;
-  return equality();
+  return stmt();
 }
