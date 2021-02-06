@@ -81,7 +81,7 @@ Token *tokenize(char *p) {
       continue;
     }
 
-    if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == ';') {
+    if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == ';' || *p == '=') {
       cur = new_token(TK_RESERVED, cur, p++, 1);
       continue;
     }
@@ -156,6 +156,13 @@ Node *primary() {
     return node;
   }
 
+  if(token->kind == TK_IDENT) {
+    node->kind = ND_LVAR;
+    node->offset = (token->str[0] - 'a' + 1) * 8; // 一旦すべての変数(a〜z)の確保する位置は決め打ち
+    token = token->next;
+    return node;
+  }
+
   return new_node_num(expect_number());
 }
 
@@ -222,7 +229,6 @@ Node *equality() {
       return node;
     }
   }
-
 }
 
 Node *assign() {
