@@ -49,3 +49,5 @@ Token *tokenize(char *p);
 void error_at(char *loc, char *fmt, ...);
 
 Node *expr(Token *token);
+
+void gen(Node *node);
