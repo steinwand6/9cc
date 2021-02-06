@@ -29,5 +29,11 @@ assert 1 '10==10'
 assert 0 '10==9'
 assert 0 '10!=10'
 assert 1 '10!=9'
+assert 1 '9<10'
+assert 0 '9<9'
+assert 0 '10<9'
+assert 1 '9<=10'
+assert 1 '9<=9'
+assert 0 '10<9'
 
 echo OK

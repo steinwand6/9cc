@@ -29,6 +29,8 @@ typedef enum {
   ND_DIV, // /
   ND_EQL, // ==
   ND_NEQ, // !=
+  ND_LES, // <
+  ND_LTE, // <=
   ND_NUM, // 整数
 } NodeKind;
 
@@ -234,7 +236,15 @@ Node *add() {
 
 Node *relational() {
   Node *node = add();
-  return node;
+  for(;;) {
+    if(consume("<")) {
+      node = new_node(ND_LES, node, mul());
+    } else if(consume("<=")) {
+      node = new_node(ND_LTE, node, mul());
+    } else {
+      return node;
+    }
+  }
 }
 
 Node *equality() {
@@ -290,6 +300,16 @@ void gen(Node *node) {
   case ND_NEQ:
     printf("  cmp rax, rdi\n");
     printf("  setne al\n");
+    printf("  movzb rax, al\n");
+    break;
+  case ND_LES:
+    printf("  cmp rax, rdi\n");
+    printf("  setl al\n");
+    printf("  movzb rax, al\n");
+    break;
+  case ND_LTE:
+    printf("  cmp rax, rdi\n");
+    printf("  setle al\n");
     printf("  movzb rax, al\n");
     break;
   default:
