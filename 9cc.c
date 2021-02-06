@@ -111,6 +111,23 @@ Token *new_token(TokenKind kind, Token *cur, char *str, int len) {
   return tok;
 }
 
+bool check_multibytes_op(char *str, char *op) {
+  int i, len = 0;
+  bool result = false;
+  for(;;) {
+    if(op[len] == '\0')
+      break;
+    len++;
+  }
+
+  for(i = 0; i < len; i++) {
+    result = str[i] == op[i];
+    if(!result)
+      return result;
+  }
+  return result;
+}
+
 // 入力文字列pをトークナイズしてそれを返す
 Token *tokenize() {
   char *p = user_input;
@@ -125,7 +142,14 @@ Token *tokenize() {
       continue;
     }
 
-    if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')') {
+    if(check_multibytes_op(p, "==") || check_multibytes_op(p, "!=") || 
+        check_multibytes_op(p, ">=") || check_multibytes_op(p, "<=")) {
+      cur = new_token(TK_RESERVED, cur, p, 2);
+      p = p + 2;  // 2文字分進める
+      continue;
+    }
+
+    if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')' || *p == '<' || *p == '>') {
       cur = new_token(TK_RESERVED, cur, p++, 1);
       continue;
     }
@@ -135,7 +159,7 @@ Token *tokenize() {
       cur->val = strtol(p, &p, 10);
       continue;
     }
-
+    printf("入れなかったよ！: %s\n", p);
     error_at(p, "トークナイズできません");
   }
 
