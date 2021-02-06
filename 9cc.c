@@ -238,9 +238,13 @@ Node *relational() {
   Node *node = add();
   for(;;) {
     if(consume("<")) {
-      node = new_node(ND_LES, node, mul());
+      node = new_node(ND_LES, node, add());
     } else if(consume("<=")) {
-      node = new_node(ND_LTE, node, mul());
+      node = new_node(ND_LTE, node, add());
+    } else if(consume(">")) {
+      node = new_node(ND_LES, add(), node);
+    } else if(consume(">=")) {
+      node = new_node(ND_LTE, add(), node);
     } else {
       return node;
     }
@@ -251,9 +255,9 @@ Node *equality() {
   Node *node = relational();
   for(;;) {
     if(consume("==")) {
-      node = new_node(ND_EQL, node, add());
+      node = new_node(ND_EQL, node, relational());
     } else if(consume("!=")) {
-      node = new_node(ND_NEQ, node, mul());
+      node = new_node(ND_NEQ, node, relational());
     } else {
       return node;
     }
