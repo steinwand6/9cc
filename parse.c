@@ -261,5 +261,5 @@ Node *program(Token *input_token) {
     code[i++] = stmt();
   }
   code[i] = NULL;
-  return stmt();
+  return code[i - 1];
 }
