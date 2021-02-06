@@ -27,6 +27,8 @@ typedef enum {
   ND_SUB, // -
   ND_MUL, // *
   ND_DIV, // /
+  ND_EQL, // ==
+  ND_NEQ, // !=
   ND_NUM, // 整数
 } NodeKind;
 
@@ -217,7 +219,7 @@ Node *mul() {
   }
 }
 
-Node *expr() {
+Node *add() {
   Node *node = mul();
   for(;;) {
     if(consume("+")) {
@@ -228,6 +230,29 @@ Node *expr() {
       return node;
     }
   }
+}
+
+Node *relational() {
+  Node *node = add();
+  return node;
+}
+
+Node *equality() {
+  Node *node = relational();
+  for(;;) {
+    if(consume("==")) {
+      node = new_node(ND_EQL, node, add());
+    } else if(consume("!=")) {
+      node = new_node(ND_NEQ, node, mul());
+    } else {
+      return node;
+    }
+  }
+
+}
+
+Node *expr() {
+  return equality();
 }
 
 void gen(Node *node) {
@@ -256,6 +281,16 @@ void gen(Node *node) {
   case ND_DIV:
     printf("   cqo\n");
     printf("   idiv rdi\n");
+    break;
+  case ND_EQL:
+    printf("  cmp rax, rdi\n");
+    printf("  sete al\n");
+    printf("  movzb rax, al\n");
+    break;
+  case ND_NEQ:
+    printf("  cmp rax, rdi\n");
+    printf("  setne al\n");
+    printf("  movzb rax, al\n");
     break;
   default:
     break;
