@@ -5,6 +5,9 @@ static char *user_input;
 // 現在着目しているトークン
 static Token *token;
 
+// 複数の式を扱うため、パース結果のノードを保管する
+Node *code[100];
+
 // エラーを報告するための関数
 // printfと同じ引数を取る
 void error(char *fmt, ...) {
@@ -252,6 +255,11 @@ Node *stmt() {
 }
 
 Node *program(Token *input_token) {
+  int i = 0;
   token = input_token;
+  while(!at_eof()){
+    code[i++] = stmt();
+  }
+  code[i] = NULL;
   return stmt();
 }
