@@ -47,3 +47,5 @@ struct Node {
 Token *tokenize(char *p);
 
 void error_at(char *loc, char *fmt, ...);
+
+Node *expr(Token *token);
