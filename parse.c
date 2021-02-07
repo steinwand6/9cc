@@ -254,12 +254,12 @@ Node *stmt() {
   return node;
 }
 
-Node *program(Token *input_token) {
+Node **program(Token *input_token) {
   int i = 0;
   token = input_token;
   while(!at_eof()){
     code[i++] = stmt();
   }
   code[i] = NULL;
-  return code[i - 1];
+  return code;
 }

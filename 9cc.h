@@ -52,6 +52,10 @@ Token *tokenize(char *p);
 
 void error_at(char *loc, char *fmt, ...);
 
-Node *program(Token *token);
+void error(char *fmt, ...);
+
+void expect(char *op);
+
+Node **program(Token *token);
 
 void gen(Node *node);
