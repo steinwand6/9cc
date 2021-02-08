@@ -8,6 +8,14 @@ static Token *token;
 // 複数の式を扱うため、パース結果のノードを保管する
 Node *code[100];
 
+// 変数を名前で検索する。見つからなかった場合はNULLを返す。
+LVar *find_lvar(Token *tok) {
+  for (LVar *var = locals; var; var = var->next)
+    if (var->len == tok->len && !memcmp(tok->str, var->name, var->len))
+      return var;
+  return NULL;
+}
+
 // エラーを報告するための関数
 // printfと同じ引数を取る
 void error(char *fmt, ...) {
@@ -123,6 +131,16 @@ bool consume(char *op) {
   return true;
 }
 
+// 次のトークンが識別子のときには、トークンを1つ読み進めて
+// 識別子トークンを返す。
+Token *consume_ident() {
+  if(token->kind != TK_IDENT)
+    error_at(token->str, "識別子ではありません");
+  Token* tok = token;
+  token = token->next;
+  return tok;
+}
+
 // 次のトークンが期待している記号のときには、トークンを1つ読み進める。
 // それ以外の場合にはエラーを報告する。
 void expect(char *op) {
@@ -167,10 +185,25 @@ Node *primary() {
   }
 
   if(token->kind == TK_IDENT) {
-    node->kind = ND_LVAR;
-    node->offset = (token->str[0] - 'a' + 1) * 8; // 一旦すべての変数(a〜z)の確保する位置は決め打ち
-    token = token->next;
-    return node;
+    Token *tok = consume_ident();
+    if (tok) {
+      Node *node = calloc(1, sizeof(Node));
+      node->kind = ND_LVAR;
+
+      LVar *lvar = find_lvar(tok);
+      if (lvar) {
+        node->offset = lvar->offset;
+      } else {
+        lvar = calloc(1, sizeof(LVar));
+        lvar->next = locals;
+        lvar->name = tok->str;
+        lvar->len = tok->len;
+        lvar->offset = locals->offset + 8;
+        node->offset = lvar->offset;
+        locals = lvar;
+      }
+      return node;
+    }
   }
 
   return new_node_num(expect_number());
@@ -264,6 +297,7 @@ Node *stmt() {
 Node **program(Token *input_token) {
   int i = 0;
   token = input_token;
+  locals = calloc(1, sizeof(LVar));
   while(!at_eof()){
     code[i++] = stmt();
   }

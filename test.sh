@@ -49,5 +49,6 @@ assert 1 '13>6*2==22+20<=14*3;'
 assert 8 'a=8;a;'
 assert 40 'z=12;a=28;z+a;'
 assert 1 'z=12;a=12;z=5;a*5==z*12;'
+assert 23 'fiz=3; baz=fiz+2; fiz_buz=fiz*buz; fiz_buz;'
 
 echo OK

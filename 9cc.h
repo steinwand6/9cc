@@ -5,6 +5,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct LVar LVar;
+
+// ローカル変数の型
+struct LVar {
+  LVar *next; // 次の変数かNULL
+  char *name; // 変数の名前
+  int len;    // 名前の長さ
+  int offset; // RBPからのオフセット
+};
+
+// ローカル変数
+LVar *locals;
+
 typedef enum {
   TK_RESERVED, // 記号
   TK_IDENT,    // 識別子
