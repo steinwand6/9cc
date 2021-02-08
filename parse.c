@@ -84,13 +84,20 @@ Token *tokenize(char *p) {
       continue;
     }
 
-    if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == ';' || *p == '=') {
+    if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')' ||
+        *p == '<' || *p == '>' || *p == ';' || *p == '=') {
       cur = new_token(TK_RESERVED, cur, p++, 1);
       continue;
     }
 
-    if(*p >= 'a' && *p <= 'z') {
-      cur = new_token(TK_IDENT, cur, p++, 1);
+    if(*p >= 'a' && *p <= 'z' || *p >= 'A' && *p <= 'Z' || *p == '_') {
+      int len = 0;
+      char *start = p;
+      do {
+        len++;
+        p++;
+      }while(*p >= 'a' && *p <= 'z' || *p >= 'A' && *p <= 'Z' || *p == '_' || (*p >= 0 && *p <= 9));
+      cur = new_token(TK_IDENT, cur, start, len);
       continue;
     }
 
