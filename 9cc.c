@@ -11,6 +11,15 @@ int main(int argc, char **argv) {
 
   // 抽象構文木を作成
   Node **code = program(token);
+  
+  // for(int j =0; code[j]; j++){
+  //   Node *test = *code;
+  //   for (int i = 0; i < 2; i++) {
+  //   printf("kind: %d, offset: %d\n", test->kind, test->offset);
+  //   test = test->rhs;
+  // }
+  // }
+  
 
   // アセンブリの前半部分を出力
   printf(".intel_syntax noprefix\n");
@@ -21,7 +30,7 @@ int main(int argc, char **argv) {
   // 変数26個分の領域を確保する
   printf("  push rbp\n");
   printf("  mov rbp, rsp\n");
-  printf("  sub rsp, 208\n");
+  printf("  sub rsp, %d\n", locals->offset);
 
   // 抽象構文木を下りながらコード生成
   for (int i = 0; code[i]; i++) {

@@ -10,6 +10,7 @@ void gen_lval(Node *node) {
 }
 
 void gen(Node *node) {
+  // printf("node->kind: %d\n", node->kind);
   switch (node->kind) {
     case ND_NUM:
       printf("  push %d\n", node->val);
