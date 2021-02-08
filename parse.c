@@ -71,6 +71,14 @@ bool check_multibytes_op(char *str, char *op) {
   return result;
 }
 
+// 与えられた文字がトークンを構成する文字か判定する
+bool is_alnum(char c) {
+  return ('a' <= c && c <= 'z') ||
+          ('A' <= c && c <= 'Z') ||
+          ('0' <= c && c <= '9') ||
+          (c == '_');
+}
+
 // 入力文字列pをトークナイズしてそれを返す
 Token *tokenize(char *p) {
   user_input = p;
@@ -82,6 +90,12 @@ Token *tokenize(char *p) {
     // 空白文字をスキップ
     if(isspace(*p)) {
       p++;
+      continue;
+    }
+
+    if(check_multibytes_op(p, "return") && isalnum(*(p+6))) {
+      cur = new_token(TK_RETURN, cur, p, 6);
+      p = p + 6;  // 6文字分進める
       continue;
     }
 
@@ -104,7 +118,7 @@ Token *tokenize(char *p) {
       do {
         len++;
         p++;
-      }while(*p >= 'a' && *p <= 'z' || *p >= 'A' && *p <= 'Z' || *p == '_' || (*p >= 0 && *p <= 9));
+      }while(is_alnum(*p));
       cur = new_token(TK_IDENT, cur, start, len);
       continue;
     }
